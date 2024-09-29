@@ -1,7 +1,17 @@
+using KnowIT.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Configuration;
+
 namespace KnowIT
 {
     public class Program
     {
+        public void ConfigureServices (IServiceCollection services)
+        {
+            services.AddDbContext<KnowledgeDbContext>(options =>
+            options.UseMySQL(Configuration.GetConnectionString("MySqlConnection"),
+            new MySqlServerVersion(new Version(8, 0, 35))));
+        }
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
