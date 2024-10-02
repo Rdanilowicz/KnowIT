@@ -10,24 +10,39 @@
 </head>
 <body>
     <header>
-        <h1>Knowledge Base</h1>
-        <nav>
-            <a asp-controller="Home" asp-action="Index">Home</a>
-            <a asp-controller="Articles" asp-action="Categories">Categories</a>
-            <a asp-controller="Articles" asp-action="Popular">Recent Articles</a>
-            <a asp-controller="Home" asp-action="Contact">Contact Us</a>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">KnowIT</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item active">
+                        <a class="nav-link" asp-area="" asp-controller="KB" asp-action="Index">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="KB" asp-action="Knowledge Base">Knowledge Base</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="KB" asp-action="About">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="KB" asp-action="Contact">Contact</a>
+                    </li>
+                </ul>
+            </div>
         </nav>
     </header>
 
+    <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2024 - KnowIT - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
+    <footer class="bg-dark text-white mt-5 p-4 text-center">
+        <p>&copy; @DateTime.Now.Year - KnowIT. All rights reserved.</p>
+    </footer>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

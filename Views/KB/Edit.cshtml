@@ -1,0 +1,24 @@
+﻿@model KnowIT.Models.Article
+
+@{
+	ViewData["Title"] = "Edit Article";
+}
+
+<h2>Edit Article</h2>
+
+<form asp-action="edit" method="post">
+	<div class="form-group">
+		<label asp-for="Title" class="control-label"></label>
+		<input asp-for="Title" class="text-danger" />
+		<span asp-validation-for="Title" class="text-danger"></span>
+	</div>
+
+	<div class="form-group">
+		<label asp-for="Content" class="control-label"></label>
+		<textarea asp-for="Content" class="form-control"></textarea>
+		<span asp-validation-for="Content" class="text-danger"></span>
+	</div>
+
+	<button type="submit" class="btn btn-primary">Save Changes</button>
+	<a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

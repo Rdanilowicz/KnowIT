@@ -1,10 +1,16 @@
-﻿@model IEnumerable<KnowIT.Models.Article>
+﻿@{
+    ViewData["Title"] = "Knowledge Base";
+}
+
+@model IEnumerable<KnowIT.Models.Article>
 
 <h2>Knowledge Base</h2>
 
+<p>
 <a asp-action="Create" class="btn btn-primary">Add New Article</a>
+</p>
 
-<table class="table">
+<table class="table table-striped">
     <thead>
         <tr>
             <th>Title</th>
@@ -14,15 +20,16 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var article in Model)
         {
             <tr>
-                <td>@item.Title</td>
-                <td>@item.Content</td>
-                <td>@item.DateCreated.ToString("g")</td>
+                <td>@article.Title</td>
+                <td>@article.Content</td>
+                <td>@article.DateCreated.ToString("g")</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@article.Id" class="btn btn-warning">Edit</a>
+                    <a asp-action="Details" asp-route-id="@article.Id" class="btn btn-Details">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@article.Id" class="btn btn-danger">Delete</a>
                 </td>
             </tr>
         }
