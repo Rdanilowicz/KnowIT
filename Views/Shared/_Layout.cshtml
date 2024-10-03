@@ -3,10 +3,43 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="KnowIT - Your Knowledge Base Portal" />
+    <meta name="keywords" content="Knowledge Base, KnowIT, Information" />
     <title>@ViewData["Title"] - KnowIT</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/KnowIT.styles.css" asp-append-version="true" />
+    <style>
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            flex: 1;
+        }
+
+        footer {
+            background-color: #343a40;
+            color: white;
+            padding: 1rem 0;
+            text-align: center;
+        }
+
+        .navbar {
+            justify-content: center;
+        }
+
+        .navbar-brand {
+            position:absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -21,7 +54,7 @@
                         <a class="nav-link" asp-area="" asp-controller="KB" asp-action="Index">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="KB" asp-action="Knowledge Base">Knowledge Base</a>
+                        <a class="nav-link" asp-area="" asp-controller="KB" asp-action="KnowledgeBase">Knowledge Base</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" asp-area="" asp-controller="KB" asp-action="About">About</a>
@@ -43,9 +76,9 @@
     <footer class="bg-dark text-white mt-5 p-4 text-center">
         <p>&copy; @DateTime.Now.Year - KnowIT. All rights reserved.</p>
     </footer>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/lib/jquery/dist/jquery.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

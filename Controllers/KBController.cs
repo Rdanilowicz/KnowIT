@@ -6,6 +6,7 @@ using System.Diagnostics;
 
 namespace KnowIT.Controllers
 {
+    //[ApiController]
     public class KBController : Controller
     {
         private readonly ILogger<KBController> _logger;
@@ -16,19 +17,21 @@ namespace KnowIT.Controllers
             _logger = logger;
             _context = context;
         }
-
+        //[HttpGet("Privacy")]
         public IActionResult Privacy()
         {
             return View();
         }
 
         // GET: Knowledge
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             return View(await _context.articles.ToListAsync());
         }
 
         // GET: Create Knowledge
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
@@ -45,14 +48,14 @@ namespace KnowIT.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View (article);
+            return View(article);
         }
 
         // GET: Knowledge/Edit
-
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
-            if(id == null)
+            if (id == null)
             {
                 return NotFound();
             }
@@ -99,6 +102,7 @@ namespace KnowIT.Controllers
         }
 
         // GET: Knowledge/Delete
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             if(id == null)
@@ -129,7 +133,8 @@ namespace KnowIT.Controllers
             return _context.articles.Any(m => m.Id == id);
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+		//[HttpGet("Error")]
+		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
