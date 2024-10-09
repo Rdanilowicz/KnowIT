@@ -25,21 +25,21 @@ namespace KnowIT.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "articles",
+                name: "Articles",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Title = table.Column<string>(type: "TEXT", nullable: false),
+                    Title = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     Content = table.Column<string>(type: "TEXT", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "TEXT", nullable: false),
                     CategoryID = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_articles", x => x.Id);
+                    table.PrimaryKey("PK_Articles", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_articles_Category_CategoryID",
+                        name: "FK_Articles_Category_CategoryID",
                         column: x => x.CategoryID,
                         principalTable: "Category",
                         principalColumn: "Id",
@@ -47,8 +47,8 @@ namespace KnowIT.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_articles_CategoryID",
-                table: "articles",
+                name: "IX_Articles_CategoryID",
+                table: "Articles",
                 column: "CategoryID");
         }
 
@@ -56,7 +56,7 @@ namespace KnowIT.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "articles");
+                name: "Articles");
 
             migrationBuilder.DropTable(
                 name: "Category");

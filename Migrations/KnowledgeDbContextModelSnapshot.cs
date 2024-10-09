@@ -35,13 +35,14 @@ namespace KnowIT.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryID");
 
-                    b.ToTable("articles");
+                    b.ToTable("Articles");
                 });
 
             modelBuilder.Entity("KnowIT.Models.Category", b =>

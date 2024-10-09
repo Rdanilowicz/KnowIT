@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<KnowledgeDbContext>(options =>
-                options.UseSqlite("Data Source=knowledge.db"));
+                options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddRazorPages();
 
@@ -21,6 +21,13 @@ builder.Services.AddRazorPages();
 //));
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<KnowledgeDbContext>();
+    dbContext.Database.OpenConnection();
+    dbContext.Database.EnsureCreated();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

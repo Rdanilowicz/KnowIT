@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using System.Diagnostics;
+using System.Linq;
 
 namespace KnowIT.Controllers
 {
@@ -27,26 +28,28 @@ namespace KnowIT.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.articles.ToListAsync());
+            var articles = await _context.Articles.ToListAsync();
+            return View(articles);
         }
 
         // GET: Create Knowledge
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            return View(new Article());
         }
 
         // POST: Validation around knowledge creation
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Title,Content")] Article article)
         {
             if (ModelState.IsValid)
             {
                 article.DateCreated = DateTime.Now; //Sets the creation date/time
-                _context.Add(article);
+                _context.Articles.Add(article);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index");
             }
             return View(article);
         }
@@ -60,7 +63,7 @@ namespace KnowIT.Controllers
                 return NotFound();
             }
 
-            var article = await _context.articles.FindAsync(id);
+            var article = await _context.Articles.FindAsync(id);
             if (article == null)
             {
                 return NotFound();
@@ -109,7 +112,7 @@ namespace KnowIT.Controllers
             {
                 return NotFound();
             }
-            var article = await _context.articles
+            var article = await _context.Articles
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (article == null)
             {
@@ -122,15 +125,15 @@ namespace KnowIT.Controllers
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var article = await _context.articles.FindAsync(id);
-            _context.articles.Remove(article);
+            var article = await _context.Articles.FindAsync(id);
+            _context.Articles.Remove(article);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index");
         }
 
         private bool ArticleExists(int id)
         {
-            return _context.articles.Any(m => m.Id == id);
+            return _context.Articles.Any(m => m.Id == id);
         }
 
 		//[HttpGet("Error")]
