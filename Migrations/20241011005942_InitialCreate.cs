@@ -30,7 +30,7 @@ namespace KnowIT.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Title = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    Title = table.Column<string>(type: "TEXT", nullable: false),
                     Content = table.Column<string>(type: "TEXT", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "TEXT", nullable: false),
                     CategoryID = table.Column<int>(type: "INTEGER", nullable: false)

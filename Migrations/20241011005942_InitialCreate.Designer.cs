@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KnowIT.Migrations
 {
     [DbContext(typeof(KnowledgeDbContext))]
-    [Migration("20241008233708_InitialCreate")]
+    [Migration("20241011005942_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -38,7 +38,6 @@ namespace KnowIT.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

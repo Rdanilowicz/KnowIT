@@ -1,0 +1,68 @@
+﻿@model Tuple<IEnumerable<KnowIT.Models.Category>, IEnumerable<KnowIT.Models.Article>>
+
+@{
+    ViewData["Title"] = "Knowledge Base";
+}
+
+<h2>Knowledge Base</h2>
+
+<!-- Categories Section -->
+<h3>Categories</h3>
+<p>
+    <a asp-controller="Category" asp-action="Create" class="btn btn-primary">Create New Category</a>
+
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Item1.First().Name)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var category in Model.Item1)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => category.Name)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@category.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@category.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Articles Section -->
+<h3>Articles</h3>
+<p>
+    <a asp-controller="KB" asp-action="Create Article" class="btn btn-success">Create New Article</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Item2.First().Title)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var article in Model.Item2)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => article.Title)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@article.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@article.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

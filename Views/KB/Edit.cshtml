@@ -19,6 +19,13 @@
 		<span asp-validation-for="Content" class="text-danger"></span>
 	</div>
 
+	<div class="form-group">
+		<label asp-for="CategoryID" class="control-label">Category</label>
+		<select asp-for="CategoryID" class="form-control" asp-items="ViewBag.Categories"></select>
+		<span asp-validation-for="CategoryID" class="text-danger"></span>
+	</div>
+
+
 	<button type="submit" class="btn btn-primary">Save Changes</button>
 	<a asp-action="Index" class="btn btn-secondary">Cancel</a>
 </form>

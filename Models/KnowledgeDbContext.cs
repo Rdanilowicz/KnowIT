@@ -9,6 +9,7 @@ namespace KnowIT.Models
 
         }
 
-        public DbSet<Article> Articles { get; set; } = null!;
-    }
+        public DbSet<Article> Articles { get; set; }
+		public DbSet<Category> Categories { get; set; }
+	}
 }

@@ -1,5 +1,6 @@
 using KnowIT.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using System.Diagnostics;
@@ -29,14 +30,19 @@ namespace KnowIT.Controllers
         public async Task<IActionResult> Index()
         {
             var articles = await _context.Articles.ToListAsync();
-            return View(articles);
+            var categories = await _context.Categories.ToListAsync();
+
+            var model = Tuple.Create((IEnumerable<KnowIT.Models.Category>)categories, (IEnumerable<KnowIT.Models.Article>)articles);
+
+            return View(model);
         }
 
         // GET: Create Knowledge
         [HttpGet]
         public IActionResult Create()
         {
-            return View(new Article());
+			ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
+			return View(new Article());
         }
 
         // POST: Validation around knowledge creation
@@ -51,7 +57,8 @@ namespace KnowIT.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-            return View(article);
+			ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", article.CategoryID);
+			return View(article);
         }
 
         // GET: Knowledge/Edit
