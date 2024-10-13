@@ -1,3 +1,13 @@
 {
-  "dependencies": {}
+  "dependencies": {
+    "secrets1": {
+      "type": "secrets",
+      "dynamicId": null
+    },
+    "sqlite1": {
+      "type": "sqlite",
+      "connectionId": "ConnectionStrings:DefaultConnection",
+      "dynamicId": null
+    }
+  }
 }

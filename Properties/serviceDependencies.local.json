@@ -1,3 +1,19 @@
 {
-  "dependencies": {}
+  "dependencies": {
+    "secrets1": {
+      "type": "secrets.user",
+      "dynamicId": null
+    },
+    "mssql1": {
+      "ignored": "true",
+      "type": "mssql",
+      "connectionId": "ConnectionStrings:DefaultConnection"
+    },
+    "sqlite1": {
+      "secretStore": "LocalSecretsFile",
+      "type": "sqlite.local",
+      "connectionId": "ConnectionStrings:DefaultConnection",
+      "dynamicId": null
+    }
+  }
 }
