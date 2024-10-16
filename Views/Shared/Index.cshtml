@@ -12,57 +12,72 @@
     <a asp-controller="Category" asp-action="Create" class="btn btn-primary">Create New Category</a>
 
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Item1.First().Name)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var category in Model.Item1)
-        {
+@if (Model.Item1 != null && Model.Item1.Any())
+{
+    <table class="table">
+        <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => category.Name)
-                </td>
-                <td>
-                    <a asp-controller="Category" asp-action="Edit" asp-route-id="@category.Id">Edit</a> |
-                    <a asp-controller="Category" asp-action="Delete" asp-route-id="@category.Id">Delete</a>
-                </td>
+                <th>
+                    @Html.DisplayNameFor(model => model.Item1.First().Name)
+                </th>
+                <th>Actions</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var category in Model.Item1)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => category.Name)
+                    </td>
+                    <td>
+                        <a asp-controller="Category" asp-action="Edit" asp-route-id="@category.Id">Edit</a> |
+                        <a asp-controller="Category" asp-action="Delete" asp-route-id="@category.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No categories available.</p>
+}
 
 <!-- Articles Section -->
 <h3>Articles</h3>
 <p>
     <a asp-controller="KB" asp-action="Create" class="btn btn-success">Create New Article</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Item2.First().Title)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var article in Model.Item2)
-        {
+
+@if (Model.Item2 != null && Model.Item2.Any())
+{
+    <table class="table">
+        <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => article.Title)
-                </td>
-                <td>
-                    <a asp-controller="KB" asp-action="Edit" asp-route-id="@article.Id">Edit</a> |
-                    <a asp-controller="KB" asp-action="Delete" asp-route-id="@article.Id">Delete</a>
-                </td>
+                <th>
+                    @Html.DisplayNameFor(model => model.Item2.First().Title)
+                </th>
+                <th>Actions</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var article in Model.Item2)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => article.Title)
+                    </td>
+                    <td>
+                        <a asp-controller="KB" asp-action="Edit" asp-route-id="@article.Id">Edit</a> |
+                        <a asp-controller="KB" asp-action="Delete" asp-route-id="@article.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No articles available.</p>
+}

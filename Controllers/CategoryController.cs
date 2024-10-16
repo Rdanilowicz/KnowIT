@@ -110,6 +110,17 @@ namespace KnowIT.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public IActionResult Cancel()
+        {
+            // Fetch both categories and articles to pass to the shared index view.
+            var categories = _context.Categories.ToList();
+            var articles = _context.Articles.ToList();
+
+            // Create the Tuple
+            var model = new Tuple<IEnumerable<Category>, IEnumerable<Article>>(categories, articles);
+
+            return View("Index", model);
+        }
 
         // GET: Category/Delete
         public async Task<IActionResult> Delete(int? id)
@@ -130,7 +141,7 @@ namespace KnowIT.Controllers
 		}
 
 		// POST: Category/Delete
-		[HttpPost, ActionName("Delete")]
+		[HttpPost, ActionName("DeleteConfirmed")]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> DeleteConfirmed(int id)
 		{
