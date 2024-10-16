@@ -34,17 +34,25 @@ namespace KnowIT.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Create([Bind("Name")] Category category)
 		{
-			//if (ModelState.IsValid)
-			//{
+			if (ModelState.IsValid)
+			{
+				// Check for errors in the ModelState
+				var errors = ModelState.Values.SelectMany(v => v.Errors);
+				foreach (var error in errors)
+				{
+					Console.WriteLine(error.ErrorMessage);  // You can log these errors or use a debugger
+				}
+
+				// If the ModelState is invalid, return the view with the current category model
+				return View(category);
+			}
 				_context.Add(category);
 				await _context.SaveChangesAsync();
-				return RedirectToAction(nameof(Index));
-			//}
-			return View(category);
+			return RedirectToAction(nameof(Index));
 		}
 
-		// GET: Category/Edit
-		public async Task<IActionResult> Edit(int? id)
+            // GET: Category/Edit
+            public async Task<IActionResult> Edit(int? id)
 		{
 			if (id == null)
 			{
@@ -59,41 +67,52 @@ namespace KnowIT.Controllers
 			return View(category);
 		}
 
-		// POST: Category/Edit
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Category category)
-		{
-			if (id != category.Id)
-			{
-				return NotFound();
-			}
+        // POST: Category/Edit
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Category category)
+        {
+            if (id != category.Id)
+            {
+                return NotFound();
+            }
 
-			if (ModelState.IsValid)
-			{
-				try
-				{
-					_context.Update(category);
-					await _context.SaveChangesAsync();
-				}
-				catch (DbUpdateConcurrencyException)
-				{
-					if (!CategoryExists(category.Id))
-					{
-						return NotFound();
-					}
-					else
-					{
-						throw;
-					}
-				}
-				return RedirectToAction("Index");
-			}
-			return View(category);
-		}
+            if (!ModelState.IsValid)
+            {
+                // Check for errors in the ModelState
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var error in errors)
+                {
+                    Console.WriteLine(error.ErrorMessage);  // You can log these errors or use a debugger
+                }
 
-		// GET: Category/Delete
-		public async Task<IActionResult> Delete(int? id)
+                // If the ModelState is invalid, return the view with the current category model
+                return View(category);
+            }
+
+            try
+            {
+                _context.Update(category);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!CategoryExists(category.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+
+        // GET: Category/Delete
+        public async Task<IActionResult> Delete(int? id)
 		{
 			if (id == null)
 			{
@@ -116,9 +135,12 @@ namespace KnowIT.Controllers
 		public async Task<IActionResult> DeleteConfirmed(int id)
 		{
 			var category = await _context.Categories.FindAsync(id);
-			_context.Categories.Remove(category);
-			await _context.SaveChangesAsync();
-			return RedirectToAction("Index");
+			if (category != null)
+			{
+				_context.Categories.Remove(category);
+				await _context.SaveChangesAsync();
+			}
+			return RedirectToAction(nameof(Index));
 		}
 
 		private bool CategoryExists(int id)

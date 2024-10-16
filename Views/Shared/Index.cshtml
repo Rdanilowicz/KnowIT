@@ -29,8 +29,8 @@
                     @Html.DisplayFor(modelItem => category.Name)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@category.Id">Edit</a> |
-                    <a asp-action="Delete" asp-route-id="@category.Id">Delete</a>
+                    <a asp-controller="Category" asp-action="Edit" asp-route-id="@category.Id">Edit</a> |
+                    <a asp-controller="Category" asp-action="Delete" asp-route-id="@category.Id">Delete</a>
                 </td>
             </tr>
         }
@@ -59,8 +59,8 @@
                     @Html.DisplayFor(modelItem => article.Title)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@article.Id">Edit</a> |
-                    <a asp-action="Delete" asp-route-id="@article.Id">Delete</a>
+                    <a asp-controller="KB" asp-action="Edit" asp-route-id="@article.Id">Edit</a> |
+                    <a asp-controller="KB" asp-action="Delete" asp-route-id="@article.Id">Delete</a>
                 </td>
             </tr>
         }
