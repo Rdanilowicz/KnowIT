@@ -39,9 +39,9 @@ namespace KnowIT.Controllers
 
         // GET: Create Knowledge
         [HttpGet]
-        public IActionResult Create()
+        public async  Task<IActionResult> Create()
         {
-			ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
+			ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name");
 			return View(new Article());
         }
 

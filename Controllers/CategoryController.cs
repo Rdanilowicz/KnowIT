@@ -19,9 +19,13 @@ namespace KnowIT.Controllers
 		// GET: Categories
 		public async Task<IActionResult> Index()
 		{
-			var categories = await _context.Categories.ToListAsync();
-			return View(categories);
-		}
+            var categories = await _context.Categories.ToListAsync();
+            var articles = await _context.Articles.ToListAsync();
+
+            // Return as a tuple to match the expected model in the Index view
+            var model = new Tuple<IEnumerable<Category>, IEnumerable<Article>>(categories, articles);
+            return View(model);
+        }
 
 		// GET: Category/Create
 		public IActionResult Create()
@@ -141,7 +145,7 @@ namespace KnowIT.Controllers
 		}
 
 		// POST: Category/Delete
-		[HttpPost, ActionName("DeleteConfirmed")]
+		[HttpPost, ActionName("Delete")]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> DeleteConfirmed(int id)
 		{
