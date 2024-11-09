@@ -33,30 +33,27 @@ namespace KnowIT.Controllers
 			return View();
 		}
 
-		// POST: Category/Create
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Create([Bind("Name")] Category category)
-		{
-			if (ModelState.IsValid)
-			{
-				// Check for errors in the ModelState
-				var errors = ModelState.Values.SelectMany(v => v.Errors);
-				foreach (var error in errors)
-				{
-					Console.WriteLine(error.ErrorMessage);  // You can log these errors or use a debugger
-				}
+        // POST: Category/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("Name")] Category category)
+        {
+            if (ModelState.IsValid)
+            {
+                // Add the category to the database
+                _context.Add(category);
+                await _context.SaveChangesAsync();
 
-				// If the ModelState is invalid, return the view with the current category model
-				return View(category);
-			}
-				_context.Add(category);
-				await _context.SaveChangesAsync();
-			return RedirectToAction(nameof(Index));
-		}
+                // Redirect to the Index view after successful creation
+                return RedirectToAction(nameof(Index));
+            }
 
-            // GET: Category/Edit
-            public async Task<IActionResult> Edit(int? id)
+            // If ModelState is invalid, return the view to display errors
+            return View(category);
+        }
+
+        // GET: Category/Edit
+        public async Task<IActionResult> Edit(int? id)
 		{
 			if (id == null)
 			{

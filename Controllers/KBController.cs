@@ -48,7 +48,7 @@ namespace KnowIT.Controllers
         // POST: Validation around knowledge creation
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Title,Content")] Article article)
+        public async Task<IActionResult> Create([Bind("Title,Content,CategoryID")] Article article)
         {
             if (ModelState.IsValid)
             {
@@ -57,7 +57,7 @@ namespace KnowIT.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-			ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", article.CategoryID);
+			ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name", article.CategoryID);
 			return View(article);
         }
 
