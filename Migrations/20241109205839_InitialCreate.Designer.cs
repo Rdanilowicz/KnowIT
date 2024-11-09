@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KnowIT.Migrations
 {
     [DbContext(typeof(KnowledgeDbContext))]
-    [Migration("20241011005942_InitialCreate")]
+    [Migration("20241109205839_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -31,6 +31,7 @@ namespace KnowIT.Migrations
 
                     b.Property<string>("Content")
                         .IsRequired()
+                        .HasMaxLength(5000)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("DateCreated")
@@ -38,6 +39,7 @@ namespace KnowIT.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -59,18 +61,18 @@ namespace KnowIT.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Category");
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("KnowIT.Models.Article", b =>
                 {
-                    b.HasOne("KnowIT.Models.Category", "category")
+                    b.HasOne("KnowIT.Models.Category", "Category")
                         .WithMany("Articles")
                         .HasForeignKey("CategoryID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("category");
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("KnowIT.Models.Category", b =>

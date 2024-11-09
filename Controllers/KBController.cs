@@ -39,10 +39,10 @@ namespace KnowIT.Controllers
 
         // GET: Create Knowledge
         [HttpGet]
-        public async  Task<IActionResult> Create()
+        public async Task<IActionResult> Create()
         {
 			ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name");
-			return View(new Article());
+			return View();
         }
 
         // POST: Validation around knowledge creation
@@ -50,16 +50,26 @@ namespace KnowIT.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Title,Content,CategoryID")] Article article)
         {
+            _logger.LogInformation($"CategoryID received in POST: {article.CategoryID}");
+
+            if (article.CategoryID == 0)
+            {
+                ModelState.AddModelError("CategoryID", "Please select a category.");
+            }
+
             if (ModelState.IsValid)
             {
-                article.DateCreated = DateTime.Now; //Sets the creation date/time
+                article.DateCreated = DateTime.Now;
                 _context.Articles.Add(article);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-			ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name", article.CategoryID);
-			return View(article);
+
+            // Populate ViewBag with categories if validation fails
+            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name");
+            return View(article);
         }
+
 
         // GET: Knowledge/Edit
         [HttpGet]
