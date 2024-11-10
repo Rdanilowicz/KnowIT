@@ -44,7 +44,7 @@ namespace KnowIT.Controllers
             var categories = await _context.Categories.ToListAsync();
             _logger.LogInformation($"Categories loaded: {categories.Count} categories");
 
-            ViewBag.Categories = new SelectList(categories, "Id", "Name");
+            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name");
             return View();
         }
 
@@ -54,42 +54,39 @@ namespace KnowIT.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Title,Content,CategoryID")] Article article)
         {
-            // Log the received article data
-            _logger.LogInformation($"Received Article: {article.Title}, {article.Content}, CategoryID: {article.CategoryID}");
+            // Log ModelState errors (if any) before validation check
+            _logger.LogInformation("ModelState Errors: ");
+            foreach (var key in ModelState.Keys)
+            {
+                foreach (var error in ModelState[key].Errors)
+                {
+                    _logger.LogInformation($"Key: {key}, Error: {error.ErrorMessage}");
+                }
+            }
 
-            // Explicitly check if CategoryID is valid
+            // Check if CategoryID is set correctly
+            _logger.LogInformation($"CategoryID received in POST: {article.CategoryID}");
+
+            // Validate CategoryID
             if (article.CategoryID == 0)
             {
                 ModelState.AddModelError("CategoryID", "Please select a category.");
             }
 
-            // Check if ModelState is valid before proceeding
+            // If the model state is valid, save the article
             if (ModelState.IsValid)
             {
-                // Explicitly set the Category navigation property based on CategoryID
-                var category = await _context.Categories.FindAsync(article.CategoryID);
-                if (category != null)
-                {
-                    article.Category = category;  // Assign the Category object to the navigation property
-                }
-
-                // Set the creation date
                 article.DateCreated = DateTime.Now;
-
-                // Add the article to the context and save
                 _context.Articles.Add(article);
                 await _context.SaveChangesAsync();
-
-                // Redirect to the Index view after successful creation
                 return RedirectToAction("Index");
             }
 
-            // If validation fails, populate ViewBag with categories for the dropdown
+            // If invalid, repopulate the categories in the ViewBag and return the view
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name");
-
-            // Return the view with the article data (including validation errors)
             return View(article);
         }
+
 
         // GET: Knowledge/Edit
         [HttpGet]

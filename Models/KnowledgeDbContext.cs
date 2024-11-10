@@ -19,10 +19,10 @@ namespace KnowIT.Models
 
             // You can explicitly define the relationship if needed
             modelBuilder.Entity<Article>()
-                .HasOne(a => a.Category)
-                .WithMany(c => c.Articles)
-                .HasForeignKey(a => a.CategoryID)
-                .OnDelete(DeleteBehavior.Cascade);
+        .HasOne<Category>()  // Specify the Category entity, not the navigation property
+        .WithMany()           // No navigation property on Category, so we don't need to specify the collection
+        .HasForeignKey(a => a.CategoryID)
+        .OnDelete(DeleteBehavior.Cascade);
         }
     }
 
