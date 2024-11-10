@@ -6,7 +6,8 @@
 
 <h2>Create Article</h2>
 
-<form asp-action="Create" method="post">
+<form asp-action="Create" asp-controller="KB" method="post">
+
     @Html.AntiForgeryToken()
 
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -26,10 +27,11 @@
     <div class="form-group">
         <label asp-for="CategoryID" class="control-label">Category</label>
         <select asp-for="CategoryID" class="form-control" asp-items="ViewBag.Categories">
-            <option value="">Please select a category</option> 
+            <option value="">Please select a category</option>
         </select>
         <span asp-validation-for="CategoryID" class="text-danger"></span>
     </div>
+
 
     <button type="submit" class="btn btn-primary">Save</button>
     <a asp-action="Index" class="btn btn-secondary">Cancel</a>
