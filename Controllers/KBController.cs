@@ -90,31 +90,31 @@ namespace KnowIT.Controllers
 
         // GET: Knowledge/Edit
         [HttpGet]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var article = await _context.Articles.FindAsync(id);
             if (article == null)
             {
                 return NotFound();
             }
 
+            // Pass the list of categories to the ViewBag
+            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", article.CategoryID);
+
             return View(article);
         }
 
+
         // POST: Knowledge/Edit
         [HttpPost]
-
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Content")] Article article)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Article article)
         {
             if (id != article.Id)
             {
                 return NotFound();
             }
+
             if (ModelState.IsValid)
             {
                 try
@@ -124,7 +124,7 @@ namespace KnowIT.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ArticleExists(article.Id))
+                    if (!_context.Articles.Any(e => e.Id == id))
                     {
                         return NotFound();
                     }
@@ -133,8 +133,11 @@ namespace KnowIT.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
             }
+
+            // Reload categories if model state is invalid
+            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", article.CategoryID);
             return View(article);
         }
 
