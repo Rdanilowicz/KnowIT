@@ -1,0 +1,44 @@
+﻿@{
+    ViewData["Title"] = "Welcome to KnowIT!";
+}
+
+<div class="container my-5">
+    <div class="text-center">
+        <h1 class="display-4">Welcome to KnowIT!</h1>
+        <p class="lead text-muted">Your go-to resource for all things knowledge. Find articles, explore categories, and get the information you need in one place.</p>
+        <hr class="my-4">
+
+        <!-- Quick Links Section -->
+        <div class="mt-4 d-flex justify-content-center">
+            <a asp-controller="KB" asp-action="Index" class="btn btn-success btn-lg mx-2">
+                Browse Articles
+            </a>
+            <a asp-controller="Category" asp-action="Manage" class="btn btn-primary btn-lg mx-2">
+                Manage Categories
+            </a>
+        </div>
+    </div>
+
+    <!-- Featured Categories Section -->
+    <div class="mt-5">
+        <h2 class="text-center">Popular Categories</h2>
+        <p class="text-center text-muted">Explore our top categories to find related articles and resources.</p>
+
+        <!-- Featured Categories List -->
+        <div class="row mt-4">
+            @foreach (var category in Model.FeaturedCategories)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">@category.Name</h5>
+                            <p class="card-text text-muted">Explore articles related to @category.Name.</p>
+                            <a asp-controller="Category" asp-action="ShowArticles" asp-route-id="@category.Id" class="btn btn-outline-primary">View Articles</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
