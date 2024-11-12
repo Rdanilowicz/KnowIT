@@ -1,0 +1,41 @@
+﻿@model IEnumerable<KnowIT.Models.Category>
+
+@{
+    ViewData["Title"] = "Manage Categories";
+}
+
+<div class="container">
+    <h2>Manage Categories</h2>
+
+    <p>
+        <a asp-controller="Category" asp-action="Create" class="btn btn-primary btn-sm">Create New Category</a>
+    </p>
+
+    @if (Model.Any())
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Category Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var category in Model)
+                {
+                    <tr>
+                        <td>@category.Name</td>
+                        <td>
+                            <a asp-controller="Category" asp-action="Edit" asp-route-id="@category.Id" class="btn btn-sm btn-secondary">Edit</a>
+                            <a asp-controller="Category" asp-action="Delete" asp-route-id="@category.Id" class="btn btn-sm btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No categories available.</p>
+    }
+</div>

@@ -27,8 +27,36 @@ namespace KnowIT.Controllers
             return View(model);
         }
 
-		// GET: Category/Create
-		public IActionResult Create()
+        public async Task<IActionResult> ShowArticles(int id)
+        {
+            // Get the selected category
+            var selectedCategory = await _context.Categories
+                .Include(c => c.Articles) // Assumes that you have a navigation property Articles in Category
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (selectedCategory == null)
+            {
+                return NotFound();
+            }
+
+            // Retrieve all categories for the sidebar
+            var allCategories = await _context.Categories.ToListAsync();
+
+            // Pass selected category articles and all categories to the view
+            var model = new Tuple<IEnumerable<Category>, IEnumerable<Article>>(allCategories, selectedCategory.Articles);
+            return View("Index", model); // Use the same Index view
+        }
+
+        // GET: Category/Manage
+        public async Task<IActionResult> Manage()
+        {
+            var categories = await _context.Categories.ToListAsync();
+            return View(categories);
+        }
+
+
+        // GET: Category/Create
+        public IActionResult Create()
 		{
 			return View();
 		}

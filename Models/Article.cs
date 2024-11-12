@@ -18,5 +18,6 @@ namespace KnowIT.Models
         [Required(ErrorMessage = "Category is required")]
         [ForeignKey("Category")] // Explicit foreign key to Category
         public int CategoryID { get; set; }
+        public Category? Category { get; set; }
     }
 }

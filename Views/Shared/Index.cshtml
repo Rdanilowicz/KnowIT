@@ -4,80 +4,82 @@
     ViewData["Title"] = "Knowledge Base";
 }
 
-<h2>Knowledge Base</h2>
+<div class="container">
+    <h2>Knowledge Base</h2>
 
-<!-- Categories Section -->
-<h3>Categories</h3>
-<p>
-    <a asp-controller="Category" asp-action="Create" class="btn btn-primary">Create New Category</a>
+    <div class="row">
+        <!-- Sidebar for Categories -->
+        <div class="col-md-3">
+            <h3>Categories</h3>
+            <p>
+                <a asp-controller="Category" asp-action="Create" class="btn btn-primary btn-sm">Create New Category</a>
+            </p>
 
-</p>
-@if (Model.Item1 != null && Model.Item1.Any())
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Item1.First().Name)
-                </th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var category in Model.Item1)
+            @if (Model.Item1 != null && Model.Item1.Any())
             {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => category.Name)
-                    </td>
-                    <td>
-                        <a asp-controller="Category" asp-action="Edit" asp-route-id="@category.Id">Edit</a> |
-                        <a asp-controller="Category" asp-action="Delete" asp-route-id="@category.Id">Delete</a>
-                    </td>
-                </tr>
+                <ul class="list-group">
+                    @foreach (var category in Model.Item1)
+                    {
+                        <li class="list-group-item">
+                            <!-- Link to ShowArticles with category ID -->
+                            <a asp-controller="Category" asp-action="ShowArticles" asp-route-id="@category.Id">
+                                @category.Name
+                            </a>
+                        </li>
+                    }
+                </ul>
             }
-        </tbody>
-    </table>
-}
-else
-{
-    <p>No categories available.</p>
-}
-
-<!-- Articles Section -->
-<h3>Articles</h3>
-<p>
-    <a asp-controller="KB" asp-action="Create" class="btn btn-success">Create New Article</a>
-</p>
-
-@if (Model.Item2 != null && Model.Item2.Any())
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Item2.First().Title)
-                </th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var article in Model.Item2)
+            else
             {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => article.Title)
-                    </td>
-                    <td>
-                        <a asp-controller="KB" asp-action="Edit" asp-route-id="@article.Id">Edit</a> |
-                        <a asp-controller="KB" asp-action="Delete" asp-route-id="@article.Id">Delete</a>
-                    </td>
-                </tr>
+                <p>No categories available.</p>
             }
-        </tbody>
-    </table>
-}
-else
-{
-    <p>No articles available.</p>
-}
+        </div>
+
+        <!-- Main Content for Articles -->
+        <div class="col-md-9">
+            <h3>Articles</h3>
+            <p>
+                <a asp-controller="KB" asp-action="Create" class="btn btn-success btn-sm">Create New Article</a>
+            </p>
+
+            @if (Model.Item2 != null && Model.Item2.Any())
+            {
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var article in Model.Item2)
+                        {
+                            <tr>
+                                <td>
+                                    <a asp-controller="KB" asp-action="Details" asp-route-id="@article.Id">
+                                        @article.Title
+                                    </a>
+                                </td>
+                                <td>
+                                    @if (article.Category != null)
+                                    {
+                                        @article.Category.Name
+                                    }
+                                </td>
+                                <td>
+                                    <a asp-controller="KB" asp-action="Edit" asp-route-id="@article.Id" class="btn btn-sm btn-secondary">Edit</a>
+                                    <a asp-controller="KB" asp-action="Delete" asp-route-id="@article.Id" class="btn btn-sm btn-danger">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>No articles available.</p>
+            }
+        </div>
+    </div>
+</div>

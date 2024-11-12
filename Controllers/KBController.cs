@@ -27,13 +27,16 @@ namespace KnowIT.Controllers
 
         // GET: Knowledge
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? categoryId)
         {
-            var articles = await _context.Articles.ToListAsync();
             var categories = await _context.Categories.ToListAsync();
 
-            var model = Tuple.Create((IEnumerable<KnowIT.Models.Category>)categories, (IEnumerable<KnowIT.Models.Article>)articles);
+            // If a categoryId is provided, filter articles by that category
+            var articles = categoryId.HasValue
+                ? await _context.Articles.Where(a => a.CategoryID == categoryId).ToListAsync()
+                : new List<Article>(); // Show no articles by default until a category is selected
 
+            var model = new Tuple<IEnumerable<Category>, IEnumerable<Article>>(categories, articles);
             return View(model);
         }
 
@@ -87,6 +90,24 @@ namespace KnowIT.Controllers
             return View(article);
         }
 
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var article = await _context.Articles
+                .Include(a => a.Category) // Eager load the Category related to the article
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (article == null)
+            {
+                return NotFound();
+            }
+
+            return View(article);
+        }
 
         // GET: Knowledge/Edit
         [HttpGet]
