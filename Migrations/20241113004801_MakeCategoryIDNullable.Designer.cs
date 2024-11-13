@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KnowIT.Migrations
 {
     [DbContext(typeof(KnowledgeDbContext))]
-    [Migration("20241110015234_FixCategoryID")]
-    partial class FixCategoryID
+    [Migration("20241113004801_MakeCategoryIDNullable")]
+    partial class MakeCategoryIDNullable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -26,7 +26,8 @@ namespace KnowIT.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("CategoryID")
+                    b.Property<int?>("CategoryID")
+                        .IsRequired()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Content")
@@ -69,7 +70,7 @@ namespace KnowIT.Migrations
                     b.HasOne("KnowIT.Models.Category", "Category")
                         .WithMany("Articles")
                         .HasForeignKey("CategoryID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired();
 
                     b.Navigation("Category");

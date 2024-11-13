@@ -15,9 +15,8 @@ namespace KnowIT.Models
         [StringLength(5000, ErrorMessage = "Content is too long")]
         public string Content { get; set; }
         public DateTime DateCreated {  get; set; } =DateTime.Now;
-        [Required(ErrorMessage = "Category is required")]
         [ForeignKey("Category")] // Explicit foreign key to Category
-        public int CategoryID { get; set; }
+        public int? CategoryID { get; set; }
         public Category? Category { get; set; }
     }
 }

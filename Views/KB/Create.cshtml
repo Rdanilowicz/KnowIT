@@ -4,38 +4,44 @@
     ViewData["Title"] = "Create Article";
 }
 
-<h2>Create Article</h2>
+<div class="container mt-4">
+    <h2 class="mb-4">Create Article</h2>
 
-<form asp-action="Create" asp-controller="KB" method="post">
+    <div class="card">
+        <div class="card-body">
+            <form asp-action="Create" asp-controller="KB" method="post">
+                @Html.AntiForgeryToken()
 
-    @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Title" class="control-label">Title</label>
+                    <input asp-for="Title" class="form-control" placeholder="Enter article title" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
 
-    <div class="form-group">
-        <label asp-for="Title" class="control-label"></label>
-        <input asp-for="Title" class="form-control" />
-        <span asp-validation-for="Title" class="text-danger"></span>
+                <div class="form-group">
+                    <label asp-for="Content" class="control-label">Content</label>
+                    <textarea asp-for="Content" class="form-control" placeholder="Enter article content"></textarea>
+                    <span asp-validation-for="Content" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="CategoryID" class="control-label">Category</label>
+                    <select asp-for="CategoryID" class="form-control" asp-items="ViewBag.Categories">
+                        <option value="">Please select a category</option>
+                    </select>
+                    <span asp-validation-for="CategoryID" class="text-danger"></span>
+                </div>
+
+                <div class="form-group text-center mt-4">
+                    <button type="submit" class="btn btn-success btn-lg mr-2">Save Article</button>
+                    <a asp-controller="KB" asp-action="Index" class="btn btn-secondary btn-lg">Cancel</a>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <div class="form-group">
-        <label asp-for="Content" class="control-label"></label>
-        <textarea asp-for="Content" class="form-control"></textarea>
-        <span asp-validation-for="Content" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="CategoryID" class="control-label">Category</label>
-        <select asp-for="CategoryID" class="form-control" asp-items="ViewBag.Categories">
-            <option value="">Please select a category</option>
-        </select>
-        <span asp-validation-for="CategoryID" class="text-danger"></span>
-    </div>
-
-
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

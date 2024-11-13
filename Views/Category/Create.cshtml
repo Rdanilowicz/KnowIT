@@ -4,22 +4,31 @@
     ViewData["Title"] = "Create Category";
 }
 
-<h2>Create Category</h2>
+<div class="container mt-4">
+    <h2 class="mb-4">Create Category</h2>
 
-<form asp-controller="Category" asp-action="Create" method="post">
-    <div class="form-group">
-        <label asp-for="Name" class="control-label"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+    <div class="card">
+        <div class="card-body">
+            <form asp-controller="Category" asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group">
+                    <label asp-for="Name" class="control-label">Category Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="Enter category name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-group text-center mt-4">
+                    <button type="submit" class="btn btn-success btn-lg mr-2">Create Category</button>
+                    <a asp-controller="KB" asp-action="Index" class="btn btn-secondary btn-lg">Cancel</a>
+                </div>
+            </form>
+        </div>
     </div>
-    <div class="form-group">
-        <input type="submit" value="Create" class="btn btn-primary" />
-        <a asp-controller="Category" asp-action="Cancel" class="btn btn-secondary">Cancel</a>
-    </div>
-</form>
+</div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
 }

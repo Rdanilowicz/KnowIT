@@ -17,12 +17,12 @@ namespace KnowIT.Models
         {
             base.OnModelCreating(modelBuilder);
 
-            // You can explicitly define the relationship if needed
+            // Configure Category-Article relationship without cascade delete
             modelBuilder.Entity<Article>()
-        .HasOne<Category>()  // Specify the Category entity, not the navigation property
-        .WithMany()           // No navigation property on Category, so we don't need to specify the collection
-        .HasForeignKey(a => a.CategoryID)
-        .OnDelete(DeleteBehavior.Cascade);
+                .HasOne(a => a.Category)
+                .WithMany(c => c.Articles)
+                .HasForeignKey(a => a.CategoryID)
+                .OnDelete(DeleteBehavior.SetNull); // Set CategoryID to null if the Category is deleted
         }
     }
 

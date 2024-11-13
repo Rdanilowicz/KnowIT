@@ -17,33 +17,42 @@ namespace KnowIT.Controllers
 		}
 
 		// GET: Categories
-		public async Task<IActionResult> Index()
+		public async Task<IActionResult> Index(int? selectedCategoryId)
 		{
             var categories = await _context.Categories.ToListAsync();
             var articles = await _context.Articles.ToListAsync();
 
             // Return as a tuple to match the expected model in the Index view
             var model = new Tuple<IEnumerable<Category>, IEnumerable<Article>>(categories, articles);
+
+            ViewBag.SelectedCategoryId = selectedCategoryId;
+
             return View(model);
         }
 
-        public async Task<IActionResult> ShowArticles(int id)
+        public async Task<IActionResult> ShowArticles(int? id)
         {
-            // Get the selected category
-            var selectedCategory = await _context.Categories
-                .Include(c => c.Articles) // Assumes that you have a navigation property Articles in Category
-                .FirstOrDefaultAsync(c => c.Id == id);
-
-            if (selectedCategory == null)
-            {
-                return NotFound();
-            }
-
-            // Retrieve all categories for the sidebar
+            // Retrieve all categories, including a "No Category" option.
             var allCategories = await _context.Categories.ToListAsync();
 
-            // Pass selected category articles and all categories to the view
-            var model = new Tuple<IEnumerable<Category>, IEnumerable<Article>>(allCategories, selectedCategory.Articles);
+            // If id is null or 0, fetch articles without a category.
+            IEnumerable<Article> articles;
+            if (id == null || id == 0)
+            {
+                articles = await _context.Articles
+                    .Where(a => a.CategoryID == null)
+                    .ToListAsync();
+            }
+            else
+            {
+                // Fetch articles with the specified category ID
+                articles = await _context.Articles
+                    .Where(a => a.CategoryID == id)
+                    .ToListAsync();
+            }
+
+            // Pass all categories and filtered articles to the view
+            var model = new Tuple<IEnumerable<Category>, IEnumerable<Article>>(allCategories, articles);
             return View("Index", model); // Use the same Index view
         }
 
@@ -169,21 +178,40 @@ namespace KnowIT.Controllers
 			return View(category);
 		}
 
-		// POST: Category/Delete
-		[HttpPost, ActionName("Delete")]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> DeleteConfirmed(int id)
-		{
-			var category = await _context.Categories.FindAsync(id);
-			if (category != null)
-			{
-				_context.Categories.Remove(category);
-				await _context.SaveChangesAsync();
-			}
-			return RedirectToAction(nameof(Index));
-		}
+        // POST: Category/Delete
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            // Retrieve the category to be deleted
+            var category = await _context.Categories.FindAsync(id);
 
-		private bool CategoryExists(int id)
+            if (category != null)
+            {
+                // Find all articles with this category
+                var associatedArticles = await _context.Articles
+                    .Where(a => a.CategoryID == id)
+                    .ToListAsync();
+
+                // Set CategoryID to null for each associated article
+                foreach (var article in associatedArticles)
+                {
+                    article.CategoryID = null;
+                }
+
+                // Save the updated articles before deleting the category
+                await _context.SaveChangesAsync();
+
+                // Remove the category
+                _context.Categories.Remove(category);
+                await _context.SaveChangesAsync();
+            }
+
+            // Redirect to the Index view after deletion
+            return RedirectToAction(nameof(Index));
+        }
+
+        private bool CategoryExists(int id)
 		{
 			return _context.Categories.Any(e => e.Id == id);
 		}

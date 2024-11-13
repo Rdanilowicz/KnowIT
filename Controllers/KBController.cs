@@ -113,14 +113,21 @@ namespace KnowIT.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var article = await _context.Articles.FindAsync(id);
+            var article = await _context.Articles
+                .Include(a => a.Category) // Include Category if it exists
+                .FirstOrDefaultAsync(a => a.Id == id);
+
             if (article == null)
             {
                 return NotFound();
             }
 
-            // Pass the list of categories to the ViewBag
-            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", article.CategoryID);
+            // Add the default option for "Please choose a category"
+            var categories = await _context.Categories.ToListAsync();
+            categories.Insert(0, new Category { Id = 0, Name = "Please choose a category" }); // Insert at the top
+
+            // Pass categories to ViewBag
+            ViewBag.Categories = new SelectList(categories, "Id", "Name", article.CategoryID ?? 0);
 
             return View(article);
         }

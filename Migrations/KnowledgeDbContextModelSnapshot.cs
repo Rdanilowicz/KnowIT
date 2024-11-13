@@ -23,7 +23,7 @@ namespace KnowIT.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("CategoryID")
+                    b.Property<int?>("CategoryID")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Content")
@@ -66,8 +66,7 @@ namespace KnowIT.Migrations
                     b.HasOne("KnowIT.Models.Category", "Category")
                         .WithMany("Articles")
                         .HasForeignKey("CategoryID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Category");
                 });

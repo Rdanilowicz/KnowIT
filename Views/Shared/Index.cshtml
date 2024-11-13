@@ -18,10 +18,17 @@
             @if (Model.Item1 != null && Model.Item1.Any())
             {
                 <ul class="list-group">
+                    <!-- Add a "No Category" button -->
+                    <li class="list-group-item">
+                        <a asp-controller="Category" asp-action="ShowArticles" asp-route-id="0">
+                            No Category
+                        </a>
+                    </li>
+
+                    <!-- Display the other categories -->
                     @foreach (var category in Model.Item1)
                     {
                         <li class="list-group-item">
-                            <!-- Link to ShowArticles with category ID -->
                             <a asp-controller="Category" asp-action="ShowArticles" asp-route-id="@category.Id">
                                 @category.Name
                             </a>
@@ -65,6 +72,10 @@
                                     @if (article.Category != null)
                                     {
                                         @article.Category.Name
+                                    }
+                                    else
+                                    {
+                                        <em>No Category</em>
                                     }
                                 </td>
                                 <td>
