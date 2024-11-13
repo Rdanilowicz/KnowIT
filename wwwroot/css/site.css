@@ -20,3 +20,8 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.selected {
+    background-color: #f0f0f0; /* Change this color as per your preference */
+    font-weight: bold;
+}

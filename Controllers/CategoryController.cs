@@ -31,30 +31,27 @@ namespace KnowIT.Controllers
         }
 
         public async Task<IActionResult> ShowArticles(int? id)
-        {
-            // Retrieve all categories, including a "No Category" option.
-            var allCategories = await _context.Categories.ToListAsync();
+{
+    var allCategories = await _context.Categories.ToListAsync();
+    IEnumerable<Article> articles;
 
-            // If id is null or 0, fetch articles without a category.
-            IEnumerable<Article> articles;
-            if (id == null || id == 0)
-            {
-                articles = await _context.Articles
-                    .Where(a => a.CategoryID == null)
-                    .ToListAsync();
-            }
-            else
-            {
-                // Fetch articles with the specified category ID
-                articles = await _context.Articles
-                    .Where(a => a.CategoryID == id)
-                    .ToListAsync();
-            }
+    // Fetch the articles based on the category ID, including "No Category"
+    if (id == null || id == 0)
+    {
+        articles = await _context.Articles.Where(a => a.CategoryID == null).ToListAsync();
+    }
+    else
+    {
+        articles = await _context.Articles.Where(a => a.CategoryID == id).ToListAsync();
+    }
 
-            // Pass all categories and filtered articles to the view
-            var model = new Tuple<IEnumerable<Category>, IEnumerable<Article>>(allCategories, articles);
-            return View("Index", model); // Use the same Index view
-        }
+    // Set the selected category ID in ViewBag to apply the highlight in the view
+    ViewBag.SelectedCategoryId = id ?? 0;
+
+    var model = new Tuple<IEnumerable<Category>, IEnumerable<Article>>(allCategories, articles);
+    return View("Index", model); // Pass the model to the shared view
+}
+
 
         // GET: Category/Manage
         public async Task<IActionResult> Manage()
@@ -145,7 +142,15 @@ namespace KnowIT.Controllers
                 }
             }
 
-            return RedirectToAction(nameof(Index));
+            var allCategories = await _context.Categories.ToListAsync();
+            var allArticles = await _context.Articles.ToListAsync();
+
+            // Pass '0' as the selected category (no category selected)
+            ViewBag.SelectedCategoryId = 0;
+
+            var model = new Tuple<IEnumerable<Category>, IEnumerable<Article>>(allCategories, allArticles);
+
+            return View("Index", model); // This returns the Index view with the updated categories and articles
         }
 
         public IActionResult Cancel()

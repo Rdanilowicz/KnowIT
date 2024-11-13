@@ -19,7 +19,7 @@
             {
                 <ul class="list-group">
                     <!-- Add a "No Category" button -->
-                    <li class="list-group-item">
+                    <li class="list-group-item @(ViewBag.SelectedCategoryId == 0 ? "selected" : "")">
                         <a asp-controller="Category" asp-action="ShowArticles" asp-route-id="0">
                             No Category
                         </a>
@@ -28,7 +28,7 @@
                     <!-- Display the other categories -->
                     @foreach (var category in Model.Item1)
                     {
-                        <li class="list-group-item">
+                        <li class="list-group-item @(ViewBag.SelectedCategoryId == category.Id ? "selected" : "")">
                             <a asp-controller="Category" asp-action="ShowArticles" asp-route-id="@category.Id">
                                 @category.Name
                             </a>
@@ -49,8 +49,14 @@
                 <a asp-controller="KB" asp-action="Create" class="btn btn-success btn-sm">Create New Article</a>
             </p>
 
-            @if (Model.Item2 != null && Model.Item2.Any())
+            @if (ViewBag.SelectedCategoryId == 0)
             {
+                <!-- Display message when "No Category" is selected -->
+                <p>No category selected. No articles to display.</p>
+            }
+            else if (Model.Item2 != null && Model.Item2.Any())
+            {
+                <!-- Only display articles that belong to the selected category -->
                 <table class="table table-hover">
                     <thead>
                         <tr>
