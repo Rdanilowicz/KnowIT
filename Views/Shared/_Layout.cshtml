@@ -35,9 +35,14 @@
         }
 
         .navbar-brand {
-            position:absolute;
+            position: absolute;
             left: 50%;
             transform: translateX(-50%);
+        }
+
+        /* Adjusting the position of the login button */
+        .navbar .login-btn {
+            margin-left: -10px; /* Slightly move the button to the left */
         }
     </style>
 </head>
@@ -59,10 +64,20 @@
                     <li class="nav-item">
                         <a class="nav-link" asp-area="" asp-controller="Category" asp-action="Manage">Categories</a>
                     </li>
-                    @* <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="KB" asp-action="Contact">Contact</a> *@
-                    </li>
                 </ul>
+            </div>
+            <!-- Right-aligned login/logout button -->
+            <div class="d-flex ml-auto">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <form asp-controller="Home" form method="post" asp-action="Logout" class="form-inline">
+                        <button type="submit" class="btn btn-outline-light">Logout</button>
+                    </form>
+                }
+                else
+                {
+                    <a href="@Url.Action("Login", "Home")" class="btn btn-outline-light login-btn">Login</a>
+                }
             </div>
         </nav>
     </header>

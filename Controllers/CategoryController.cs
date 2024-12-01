@@ -1,4 +1,6 @@
 ﻿using KnowIT.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -9,15 +11,28 @@ namespace KnowIT.Controllers
 	{
 		private readonly KnowledgeDbContext _context;
 		private readonly ILogger<CategoryController> _logger;
+        private readonly UserManager<IdentityUser> _userManager;
 
-		public CategoryController(ILogger<CategoryController> logger, KnowledgeDbContext context)
+		public CategoryController(ILogger<CategoryController> logger, KnowledgeDbContext context, UserManager<IdentityUser> userManager)
 		{
 			_context = context;
 			_logger = logger;
+            _userManager = userManager;
 		}
 
-		// GET: Categories
-		public async Task<IActionResult> Index(int? selectedCategoryId)
+        // Helper method to check if the user is an admin
+        private async Task<bool> IsUserAdminAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return false;
+
+            return await _userManager.IsInRoleAsync(user, "Admin");
+        }
+
+        // GET: Categories
+        [AllowAnonymous]
+        public async Task<IActionResult> Index(int? selectedCategoryId)
 		{
             var categories = await _context.Categories.ToListAsync();
             var articles = await _context.Articles.ToListAsync();
@@ -30,6 +45,7 @@ namespace KnowIT.Controllers
             return View(model);
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> ShowArticles(int? id)
 {
     var allCategories = await _context.Categories.ToListAsync();
@@ -62,12 +78,14 @@ namespace KnowIT.Controllers
 
 
         // GET: Category/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
 		{
 			return View();
 		}
 
         // POST: Category/Create
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name")] Category category)
@@ -87,6 +105,7 @@ namespace KnowIT.Controllers
         }
 
         // GET: Category/Edit
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
 		{
 			if (id == null)
@@ -103,6 +122,7 @@ namespace KnowIT.Controllers
 		}
 
         // POST: Category/Edit
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Category category)
@@ -153,6 +173,7 @@ namespace KnowIT.Controllers
             return View("Index", model); // This returns the Index view with the updated categories and articles
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Cancel()
         {
             // Fetch both categories and articles to pass to the shared index view.
@@ -166,6 +187,7 @@ namespace KnowIT.Controllers
         }
 
         // GET: Category/Delete
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
 		{
 			if (id == null)
@@ -184,6 +206,7 @@ namespace KnowIT.Controllers
 		}
 
         // POST: Category/Delete
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

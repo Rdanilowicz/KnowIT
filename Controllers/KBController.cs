@@ -1,4 +1,5 @@
 using KnowIT.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +9,7 @@ using System.Linq;
 
 namespace KnowIT.Controllers
 {
-    //[ApiController]
+    
     public class KBController : Controller
     {
         private readonly ILogger<KBController> _logger;
@@ -19,13 +20,14 @@ namespace KnowIT.Controllers
             _logger = logger;
             _context = context;
         }
-        //[HttpGet("Privacy")]
+       
         public IActionResult Privacy()
         {
             return View();
         }
 
         // GET: Knowledge
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Index(int? categoryId)
         {
@@ -41,6 +43,7 @@ namespace KnowIT.Controllers
         }
 
         // GET: Create Knowledge
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -53,6 +56,7 @@ namespace KnowIT.Controllers
 
 
         // POST: Validation around knowledge creation
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Title,Content,CategoryID")] Article article)
@@ -90,6 +94,7 @@ namespace KnowIT.Controllers
             return View(article);
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -110,6 +115,7 @@ namespace KnowIT.Controllers
         }
 
         // GET: Knowledge/Edit
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -134,6 +140,7 @@ namespace KnowIT.Controllers
 
 
         // POST: Knowledge/Edit
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Article article)
@@ -170,6 +177,7 @@ namespace KnowIT.Controllers
         }
 
         // GET: Knowledge/Delete
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
@@ -187,6 +195,7 @@ namespace KnowIT.Controllers
         }
 
         //POST: Knowledge/Delete
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

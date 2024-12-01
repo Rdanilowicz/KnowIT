@@ -7,9 +7,13 @@
 <div class="container">
     <h2>Manage Categories</h2>
 
-    <p>
-        <a asp-controller="Category" asp-action="Create" class="btn btn-primary btn-sm">Create New Category</a>
-    </p>
+    <!-- Only show the "Create New Category" button if the user is an Admin -->
+    @if (User.IsInRole("Admin"))
+    {
+        <p>
+            <a asp-controller="Category" asp-action="Create" class="btn btn-primary btn-sm">Create New Category</a>
+        </p>
+    }
 
     @if (Model.Any())
     {
@@ -26,8 +30,12 @@
                     <tr>
                         <td>@category.Name</td>
                         <td>
-                            <a asp-controller="Category" asp-action="Edit" asp-route-id="@category.Id" class="btn btn-sm btn-secondary">Edit</a>
-                            <a asp-controller="Category" asp-action="Delete" asp-route-id="@category.Id" class="btn btn-sm btn-danger">Delete</a>
+                            <!-- Only show Edit and Delete buttons for Admin users -->
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a asp-controller="Category" asp-action="Edit" asp-route-id="@category.Id" class="btn btn-sm btn-secondary">Edit</a>
+                                <a asp-controller="Category" asp-action="Delete" asp-route-id="@category.Id" class="btn btn-sm btn-danger">Delete</a>
+                            }
                         </td>
                     </tr>
                 }

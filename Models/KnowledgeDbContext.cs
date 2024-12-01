@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace KnowIT.Models
 {
-    public class KnowledgeDbContext : DbContext
+    public class KnowledgeDbContext : IdentityDbContext<IdentityUser>
     {
         public KnowledgeDbContext(DbContextOptions<KnowledgeDbContext> options) : base(options)
         {

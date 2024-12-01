@@ -7,17 +7,6 @@
 <div class="container">
     <h2 class="my-4">@Model.Title</h2>
 
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-body">
-                    <h3 class="card-title">Content</h3>
-                    <p class="card-text">@Model.Content</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Display Category -->
     <div class="row mb-4">
         <div class="col-md-8">
@@ -30,11 +19,26 @@
         </div>
     </div>
 
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">Content</h3>
+                    <p class="card-text">@Model.Content</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Action Buttons -->
     <div class="row">
         <div class="col-md-8">
-            <a asp-controller="KB" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary btn-lg mr-2">Edit</a>
-            <a asp-controller="KB" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger btn-lg">Delete</a>
+            <!-- Only show Edit and Delete buttons if the user is an Admin -->
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-controller="KB" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary btn-lg mr-2">Edit</a>
+                <a asp-controller="KB" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger btn-lg">Delete</a>
+            }
         </div>
     </div>
 </div>

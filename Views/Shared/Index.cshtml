@@ -11,9 +11,14 @@
         <!-- Sidebar for Categories -->
         <div class="col-md-3">
             <h3>Categories</h3>
-            <p>
-                <a asp-controller="Category" asp-action="Create" class="btn btn-primary btn-sm">Create New Category</a>
-            </p>
+
+            <!-- Check if the user is an Admin to show the "Create New Category" button -->
+            @if (User.IsInRole("Admin"))
+            {
+                <p>
+                    <a asp-controller="Category" asp-action="Create" class="btn btn-primary btn-sm">Create New Category</a>
+                </p>
+            }
 
             @if (Model.Item1 != null && Model.Item1.Any())
             {
@@ -45,9 +50,14 @@
         <!-- Main Content for Articles -->
         <div class="col-md-9">
             <h3>Articles</h3>
-            <p>
-                <a asp-controller="KB" asp-action="Create" class="btn btn-success btn-sm">Create New Article</a>
-            </p>
+
+            <!-- Check if the user is an Admin to show the "Create New Article" button -->
+            @if (User.IsInRole("Admin"))
+            {
+                <p>
+                    <a asp-controller="KB" asp-action="Create" class="btn btn-success btn-sm">Create New Article</a>
+                </p>
+            }
 
             @if (ViewBag.SelectedCategoryId == 0)
             {
@@ -85,8 +95,12 @@
                                     }
                                 </td>
                                 <td>
-                                    <a asp-controller="KB" asp-action="Edit" asp-route-id="@article.Id" class="btn btn-sm btn-secondary">Edit</a>
-                                    <a asp-controller="KB" asp-action="Delete" asp-route-id="@article.Id" class="btn btn-sm btn-danger">Delete</a>
+                                    <!-- Restrict Edit/Delete buttons to Admin role -->
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <a asp-controller="KB" asp-action="Edit" asp-route-id="@article.Id" class="btn btn-sm btn-secondary">Edit</a>
+                                        <a asp-controller="KB" asp-action="Delete" asp-route-id="@article.Id" class="btn btn-sm btn-danger">Delete</a>
+                                    }
                                 </td>
                             </tr>
                         }

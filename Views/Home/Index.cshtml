@@ -3,6 +3,7 @@
 }
 
 <div class="container my-5">
+
     <div class="text-center">
         <h1 class="display-4">Welcome to KnowIT!</h1>
         <p class="lead text-muted">Your go-to resource for all things knowledge. Find articles, explore categories, and get the information you need in one place.</p>
@@ -13,9 +14,14 @@
             <a asp-controller="KB" asp-action="Index" class="btn btn-success btn-lg mx-2">
                 Browse Articles
             </a>
-            <a asp-controller="Category" asp-action="Manage" class="btn btn-primary btn-lg mx-2">
-                Manage Categories
-            </a>
+
+            <!-- Conditionally show the Manage Categories button only for admins -->
+            @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+            {
+                <a asp-controller="Category" asp-action="Manage" class="btn btn-primary btn-lg mx-2">
+                    Manage Categories
+                </a>
+            }
         </div>
     </div>
 
@@ -41,4 +47,3 @@
         </div>
     </div>
 </div>
-

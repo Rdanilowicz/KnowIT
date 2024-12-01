@@ -1,0 +1,36 @@
+﻿@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="text-center my-4">Login</h2>
+
+            <!-- Display error message if login fails -->
+            @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey(""))
+            {
+                <div class="alert alert-danger">
+                    @ViewData.ModelState[""].Errors[0].ErrorMessage
+                </div>
+            }
+
+            <form asp-action="Login" method="post">
+                <div class="form-group mb-4">
+                    <label for="Username">Username</label>
+                    <input type="text" id="Username" name="username" class="form-control" required />
+                </div>
+                <div class="form-group mb-4">
+                    <label for="Password">Password</label>
+                    <input type="password" id="Password" name="password" class="form-control" required />
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+            </form>
+
+            @* TODO: implement admin account creation and associated logic
+            <div class="mt-3 text-center">
+                <p>Don't have an account? <a href="#">Register here</a></p>
+            </div> *@
+        </div>
+    </div>
+</div>
