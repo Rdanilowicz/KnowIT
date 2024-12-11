@@ -24,7 +24,9 @@
             <div class="card">
                 <div class="card-body">
                     <h3 class="card-title">Content</h3>
-                    <p class="card-text">@Model.Content</p>
+                    <div class="card-text" id="article-content">
+                        @Html.Raw(Model.Content)
+                    </div>
                 </div>
             </div>
         </div>
@@ -42,3 +44,16 @@
         </div>
     </div>
 </div>
+
+<!-- Add the DOMPurify script to sanitize content on page load -->
+<script src="https://cdn.jsdelivr.net/npm/dompurify@2.3.5/dist/purify.min.js"></script>
+<script>
+    // Ensure the page content is sanitized after it's loaded
+    window.onload = function () {
+        const contentElement = document.getElementById('article-content');
+        if (contentElement) {
+            // Sanitize the inner HTML of the content before displaying
+            contentElement.innerHTML = DOMPurify.sanitize(contentElement.innerHTML);
+        }
+    };
+</script>

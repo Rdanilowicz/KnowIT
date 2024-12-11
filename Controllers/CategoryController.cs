@@ -106,71 +106,62 @@ namespace KnowIT.Controllers
 
         // GET: Category/Edit
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int? id)
-		{
-			if (id == null)
-			{
-				return NotFound();
-			}
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
 
-			var category = await _context.Categories.FindAsync(id);
-			if (category == null)
-			{
-				return NotFound();
-			}
-			return View(category);
-		}
+            if (category == null)
+            {
+                return NotFound();
+            }
+
+            return View(category);
+        }
 
         // POST: Category/Edit
         [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Category category)
+        public async Task<IActionResult> Edit(int id, [Bind("Id, Name")] Category category)
         {
             if (id != category.Id)
             {
                 return NotFound();
             }
 
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                // Check for errors in the ModelState
-                var errors = ModelState.Values.SelectMany(v => v.Errors);
-                foreach (var error in errors)
+                try
                 {
-                    Console.WriteLine(error.ErrorMessage);  // You can log these errors or use a debugger
+                    // Update the category in the database
+                    _context.Categories.Update(category);
+
+                    // Save the changes to the category
+                    await _context.SaveChangesAsync();
+
+                    var updatedArticles = await _context.Articles
+                        .Where(a => a.CategoryID == category.Id)
+                        .ToListAsync();
+                                                          
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.Categories.Any(e => e.Id == id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
 
-                // If the ModelState is invalid, return the view with the current category model
-                return View(category);
+                // Redirect to the index page or any other page after successfully updating
+                return RedirectToAction(nameof(Index));
             }
 
-            try
-            {
-                _context.Update(category);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CategoryExists(category.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            var allCategories = await _context.Categories.ToListAsync();
-            var allArticles = await _context.Articles.ToListAsync();
-
-            // Pass '0' as the selected category (no category selected)
-            ViewBag.SelectedCategoryId = 0;
-
-            var model = new Tuple<IEnumerable<Category>, IEnumerable<Article>>(allCategories, allArticles);
-
-            return View("Index", model); // This returns the Index view with the updated categories and articles
+            return View(category);
         }
 
         [Authorize(Roles = "Admin")]

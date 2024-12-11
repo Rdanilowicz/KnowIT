@@ -128,12 +128,11 @@ namespace KnowIT.Controllers
                 return NotFound();
             }
 
-            // Add the default option for "Please choose a category"
+            // Add the default option for "Please choose a category" or "No Category"
             var categories = await _context.Categories.ToListAsync();
-            categories.Insert(0, new Category { Id = 0, Name = "Please choose a category" }); // Insert at the top
-
-            // Pass categories to ViewBag
+            categories.Insert(0, new Category { Id = 0, Name = "No Category" }); // Insert at the top
             ViewBag.Categories = new SelectList(categories, "Id", "Name", article.CategoryID ?? 0);
+
 
             return View(article);
         }
@@ -148,6 +147,12 @@ namespace KnowIT.Controllers
             if (id != article.Id)
             {
                 return NotFound();
+            }
+
+            // If CategoryID is set to 0, make it null (representing "No Category")
+            if (article.CategoryID == 0)
+            {
+                article.CategoryID = null;
             }
 
             if (ModelState.IsValid)
@@ -175,6 +180,7 @@ namespace KnowIT.Controllers
             ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", article.CategoryID);
             return View(article);
         }
+
 
         // GET: Knowledge/Delete
         [Authorize(Roles = "Admin")]

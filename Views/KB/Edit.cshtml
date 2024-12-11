@@ -18,7 +18,7 @@
 
                 <div class="form-group">
                     <label asp-for="Content" class="control-label"></label>
-                    <textarea asp-for="Content" class="form-control" rows="5" placeholder="Write your content here"></textarea>
+                    <textarea asp-for="Content" class="form-control" rows="5" placeholder="Write your content here" id="editor">@Model.Content</textarea>
                     <span asp-validation-for="Content" class="text-danger"></span>
                 </div>
 
@@ -38,3 +38,12 @@
         </div>
     </div>
 </div>
+
+<script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/ckeditor.js"></script>
+<script>
+    ClassicEditor
+        .create(document.querySelector('#editor'))
+        .catch(error => {
+            console.error(error);
+        });
+</script>

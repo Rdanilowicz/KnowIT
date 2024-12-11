@@ -1,52 +1,166 @@
 using KnowIT.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Configuration;
-using Pomelo.EntityFrameworkCore.MySql;
 using Microsoft.AspNetCore.Identity;
-
-
+using Amazon.SecretsManager;
+using Amazon.SecretsManager.Model;
+using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
-builder.Services.AddDbContext<KnowledgeDbContext>(options =>
-                options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddRazorPages();
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<KnowledgeDbContext>()
     .AddDefaultTokenProviders();
 
+// Configure logging
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
 
-builder.Services.AddRazorPages();
+// Create a logger factory and logger instance explicitly
+var loggerFactory = LoggerFactory.Create(logging =>
+{
+    logging.AddConsole();
+    logging.AddDebug();
+});
+var logger = loggerFactory.CreateLogger<Program>();
 
-//builder.Services.AddDbContext<KnowledgeDbContext>(options =>
-//    options.UseMySQL(
-//        builder.Configuration.GetConnectionString("MySqlConnection")
-//        //new MySqlServerVersion(new Version(8, 0, 35))
-//));
+// Function to retrieve the connection string
+string GetConnectionString()
+{
+    // Check for the connection string in environment variables
+    string connectionString = Environment.GetEnvironmentVariable("MYSQL_CONNECTION_STRING");
+
+    if (string.IsNullOrEmpty(connectionString))
+    {
+        logger.LogInformation("Environment variable MYSQL_CONNECTION_STRING is not set. Falling back to AWS Secrets Manager...");
+        return GetConnectionStringFromSecretsManager(logger);
+    }
+    else
+    {
+        logger.LogInformation("Using connection string from environment variable.");
+        return connectionString;
+    }
+}
+
+// Function to retrieve connection string from AWS Secrets Manager
+string GetConnectionStringFromSecretsManager(ILogger logger)
+{
+    try
+    {
+        logger.LogInformation("Attempting to retrieve secrets and metadata from AWS Secrets Manager...");
+
+        var client = new AmazonSecretsManagerClient(Amazon.RegionEndpoint.USEast1);
+
+        var describeRequest = new DescribeSecretRequest
+        {
+            SecretId = "rds!db-6cb2165d-f548-4d91-b918-d082b307a660"
+        };
+
+        var describeResponse = client.DescribeSecretAsync(describeRequest).Result;
+
+        var tags = describeResponse.Tags;
+        string server = tags.FirstOrDefault(tag => tag.Key == "Server")?.Value;
+        string database = tags.FirstOrDefault(tag => tag.Key == "Database")?.Value;
+
+        if (string.IsNullOrEmpty(server) || string.IsNullOrEmpty(database))
+        {
+            throw new Exception("Required tags (Server or Database) are missing in the secret metadata.");
+        }
+
+        var secretRequest = new GetSecretValueRequest
+        {
+            SecretId = "rds!db-6cb2165d-f548-4d91-b918-d082b307a660"
+        };
+
+        var secretResponse = client.GetSecretValueAsync(secretRequest).Result;
+
+        var secretJson = secretResponse.SecretString;
+        var secretData = JsonConvert.DeserializeObject<Dictionary<string, string>>(secretJson);
+
+        if (!secretData.TryGetValue("username", out var username) || !secretData.TryGetValue("password", out var password))
+        {
+            throw new Exception("The secret does not contain required fields (username or password).");
+        }
+
+        logger.LogInformation("Successfully retrieved secrets and metadata. Constructing the connection string...");
+        return $"Server={server};Database={database};User={username};Password={password};";
+    }
+    catch (Exception ex)
+    {
+        logger.LogError($"Error retrieving secrets or metadata: {ex.Message}");
+        throw;
+    }
+}
+
+// Function to retrieve admin credentials from AWS Secrets Manager
+string GetAdminCredentialsFromSecretsManager(ILogger logger, string secretId)
+{
+    try
+    {
+        logger.LogInformation($"Attempting to retrieve admin credentials from AWS Secrets Manager: {secretId}");
+
+        var client = new AmazonSecretsManagerClient(Amazon.RegionEndpoint.USEast1);
+        var secretRequest = new GetSecretValueRequest { SecretId = secretId };
+        var secretResponse = client.GetSecretValueAsync(secretRequest).Result;
+
+        logger.LogInformation("Successfully retrieved admin credentials.");
+        return secretResponse.SecretString;
+    }
+    catch (Exception ex)
+    {
+        logger.LogError($"Error retrieving admin credentials: {ex.Message}");
+        throw;
+    }
+}
+
+// Add DbContext with the dynamically resolved connection string
+builder.Services.AddDbContext<KnowledgeDbContext>(options =>
+    options.UseMySql(
+        GetConnectionString(),
+        new MySqlServerVersion(new Version(8, 0, 35)),
+        mySqlOptions => mySqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(10),
+            errorNumbersToAdd: null
+        )
+    )
+);
 
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<KnowledgeDbContext>();
-    dbContext.Database.OpenConnection();
-    dbContext.Database.EnsureCreated();
+    var scopedLogger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        scopedLogger.LogInformation("Attempting to open database connection...");
+
+        var dbContext = scope.ServiceProvider.GetRequiredService<KnowledgeDbContext>();
+        dbContext.Database.OpenConnection();
+        dbContext.Database.EnsureCreated();
+
+        scopedLogger.LogInformation("Database connection successfully opened and ensured created.");
+    }
+    catch (Exception ex)
+    {
+        scopedLogger.LogError($"Error connecting to the database: {ex.Message}");
+        throw;
+    }
 }
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
 
 app.UseAuthentication();
@@ -56,25 +170,26 @@ app.UseAuthorization();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var scopedLogger = services.GetRequiredService<ILogger<Program>>();
 
-    // Define the SeedAdminAsync method as a local function
-    async Task SeedAdminAsync(IServiceProvider serviceProvider)
+    async Task SeedAdminAsync(IServiceProvider serviceProvider, ILogger logger)
     {
         var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
-        // Check if the Admin role exists, and create it if not
         const string adminRole = "Admin";
         if (!await roleManager.RoleExistsAsync(adminRole))
         {
             await roleManager.CreateAsync(new IdentityRole(adminRole));
         }
 
-        // Check if an Admin user exists, and create it if not
-        const string adminEmail = "admin@knowit.com";
-        const string adminPassword = "SecurePassword123!"; // Use a secure password in production!
-        var existingAdmin = await userManager.FindByEmailAsync(adminEmail);
+        string secretJson = GetAdminCredentialsFromSecretsManager(logger, "KnowIT_Admin_Login");
+        var secretData = JsonConvert.DeserializeObject<Dictionary<string, string>>(secretJson);
 
+        string adminEmail = secretData["adminEmail"];
+        string adminPassword = secretData["adminPassword"];
+
+        var existingAdmin = await userManager.FindByEmailAsync(adminEmail);
         if (existingAdmin == null)
         {
             var adminUser = new IdentityUser
@@ -92,14 +207,14 @@ using (var scope = app.Services.CreateScope())
             }
             else
             {
-                throw new Exception("Failed to create the admin user: " +
+                logger.LogError("Failed to create admin user: " +
                     string.Join(", ", result.Errors.Select(e => e.Description)));
+                throw new Exception("Admin user creation failed.");
             }
         }
     }
 
-    // Call the SeedAdminAsync method
-    await SeedAdminAsync(services);
+    await SeedAdminAsync(services, scopedLogger);
 }
 
 app.MapControllerRoute(
@@ -107,4 +222,3 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
-

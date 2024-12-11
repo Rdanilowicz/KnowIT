@@ -14,18 +14,21 @@
 
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+                <!-- Title Field -->
                 <div class="form-group">
                     <label asp-for="Title" class="control-label">Title</label>
                     <input asp-for="Title" class="form-control" placeholder="Enter article title" />
                     <span asp-validation-for="Title" class="text-danger"></span>
                 </div>
 
+                <!-- Content Field -->
                 <div class="form-group">
                     <label asp-for="Content" class="control-label">Content</label>
-                    <textarea asp-for="Content" class="form-control" placeholder="Enter article content"></textarea>
+                    <textarea asp-for="Content" class="form-control" rows="10" id="editor" placeholder="Enter article content"></textarea>
                     <span asp-validation-for="Content" class="text-danger"></span>
                 </div>
 
+                <!-- Category Dropdown -->
                 <div class="form-group">
                     <label asp-for="CategoryID" class="control-label">Category</label>
                     <select asp-for="CategoryID" class="form-control" asp-items="ViewBag.Categories">
@@ -34,6 +37,7 @@
                     <span asp-validation-for="CategoryID" class="text-danger"></span>
                 </div>
 
+                <!-- Submit Buttons -->
                 <div class="form-group text-center mt-4">
                     <button type="submit" class="btn btn-success btn-lg mr-2">Save Article</button>
                     <a asp-controller="KB" asp-action="Index" class="btn btn-secondary btn-lg">Cancel</a>
@@ -43,6 +47,12 @@
     </div>
 </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+<!-- CKEditor Script -->
+<script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/ckeditor.js"></script>
+<script>
+    ClassicEditor
+        .create(document.querySelector('#editor'))
+        .catch(error => {
+            console.error(error);
+        });
+</script>

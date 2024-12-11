@@ -59,14 +59,45 @@
                 </p>
             }
 
-            @if (ViewBag.SelectedCategoryId == 0)
+            @if (ViewBag.SelectedCategoryId == 0 && Model.Item2 != null && Model.Item2.Any())
             {
-                <!-- Display message when "No Category" is selected -->
-                <p>No category selected. No articles to display.</p>
+                <!-- Display articles with no category -->
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var article in Model.Item2)
+                        {
+                            <tr>
+                                <td>
+                                    <a asp-controller="KB" asp-action="Details" asp-route-id="@article.Id">
+                                        @article.Title
+                                    </a>
+                                </td>
+                                <td>
+                                    <em>No Category</em>
+                                </td>
+                                <td>
+                                    <!-- Restrict Edit/Delete buttons to Admin role -->
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <a asp-controller="KB" asp-action="Edit" asp-route-id="@article.Id" class="btn btn-sm btn-secondary">Edit</a>
+                                        <a asp-controller="KB" asp-action="Delete" asp-route-id="@article.Id" class="btn btn-sm btn-danger">Delete</a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             }
             else if (Model.Item2 != null && Model.Item2.Any())
             {
-                <!-- Only display articles that belong to the selected category -->
+                <!-- Display articles in the selected category -->
                 <table class="table table-hover">
                     <thead>
                         <tr>
