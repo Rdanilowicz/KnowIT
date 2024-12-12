@@ -95,26 +95,22 @@ Microsoft Identity for authentication and authorization
 
    - If the `MYSQL_CONNECTION_STRING` environment variable is set, the application will use it for local testing or development.
    - If not, the application will fetch the connection string from AWS Secrets Manager for production deployments.
-   - **Note**: The `MYSQL_CONNECTION_STRING` will be provided separately upon request. Please contact the project maintainers for access.
+   - **Note**: The `MYSQL_CONNECTION_STRING` as well as KnowIT admin username and password will be provided separately upon request. Please contact the project maintainers for access.
 
-Optionally, set environment variables locally:
-   
-   $env:MYSQL_CONNECTION_STRING="your-connection-string"
-   $env:AWS_ACCESS_KEY_ID="your-access-key-id"
-   $env:AWS_SECRET_ACCESS_KEY="your-secret-access-key"
+Optionally, set environment variables locally (see the setting up environmental variables section below)
 
 
 Run the application:
 
-Open the project in Visual Studio and press F5.
+Open the project in Visual Studio (or your IDE of choice) and press F5.
 
 Or, use the terminal:
 
 dotnet run
 
-3. Docker
+### 3. Docker
 
-Run the application using Docker:
+Run the application using Docker. You will likely need to sete up environmental variables, see the section on this below: 
 
 Build the Docker image:
 
@@ -129,10 +125,162 @@ Access the application at http://localhost:8080.
 ---
 
 ### Environment Variables
+
 The application uses the following environment variables:
 
 ASPNETCORE_ENVIRONMENT: Set to Development or Production.
 
-MYSQL_CONNECTION_STRING: Used for local development and testing to specify the database connection string.
+MYSQL_CONNECTION_STRING: Used for local development and testing to specify the database connection string. 
 
-AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY: Required for AWS integration and used for production deployments.
+KNOWIT_ADMIN_USERNAME: Admin username for role initialization.
+
+KNOWIT_ADMIN_PASSWORD: Admin password for role initialization.
+
+AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY: Required for AWS integration and used for production deployments.These allow for the AWS IAM profile to interact with secrets manager, you do not need to set these if not using this functionality.
+
+
+### Setting Environment Variables (Windows - PowerShell)
+
+1. Set Environment Variables for Current Session
+
+This method sets the environment variables for the current terminal session only. These will be cleared when the session ends.
+
+$env:MYSQL_CONNECTION_STRING="your-connection-string"
+$env:KNOWIT_ADMIN_USERNAME="admin@example.com"
+$env:KNOWIT_ADMIN_PASSWORD="your-secure-password"
+
+2. Set Environment Variables Permanently
+
+To persist the environment variables so they are available across terminal sessions, use the following commands:
+
+[System.Environment]::SetEnvironmentVariable("MYSQL_CONNECTION_STRING", "your-connection-string", "User")
+[System.Environment]::SetEnvironmentVariable("KNOWIT_ADMIN_USERNAME", "admin@example.com", "User")
+[System.Environment]::SetEnvironmentVariable("KNOWIT_ADMIN_PASSWORD", "your-secure-password", "User")
+
+Note: The "User" scope sets the variable for the current user only. To set it system-wide, replace "User" with "Machine". However, setting system-wide variables requires administrative privileges.
+
+3. Verify Environment Variables
+
+To verify that the variables have been set, use the following commands:
+
+echo $env:MYSQL_CONNECTION_STRING
+echo $env:KNOWIT_ADMIN_USERNAME
+echo $env:KNOWIT_ADMIN_PASSWORD
+
+For permanently set variables, use:
+
+[System.Environment]::GetEnvironmentVariable("MYSQL_CONNECTION_STRING", "User")
+[System.Environment]::GetEnvironmentVariable("KNOWIT_ADMIN_USERNAME", "User")
+[System.Environment]::GetEnvironmentVariable("KNOWIT_ADMIN_PASSWORD", "User")
+
+This ensures that the application will use the correct database connection string and admin credentials during startup.
+
+### Setting Up Environment Variables (Linux/macOS)
+
+For Linux and macOS users, you can set the required environment variables by using the export command in your terminal. You can also make the variables persist across sessions by adding them to your shell configuration file (e.g., .bashrc, .zshrc, or .bash_profile).
+
+One-Time Setup (For Current Session Only)
+To set the environment variables for the current terminal session:
+
+
+export MYSQL_CONNECTION_STRING="your-connection-string"
+export KNOWIT_ADMIN_USERNAME="admin@example.com"
+export KNOWIT_ADMIN_PASSWORD="securepassword"
+export AWS_ACCESS_KEY_ID="your-access-key-id"
+export AWS_SECRET_ACCESS_KEY="your-secret-access-key"
+Verify that the variables are set:
+
+
+echo $MYSQL_CONNECTION_STRING
+echo $KNOWIT_ADMIN_USERNAME
+Persistent Setup (Across Sessions)
+To make the environment variables persist across terminal sessions:
+
+Open your shell configuration file in an editor (e.g., .bashrc, .zshrc, or .bash_profile):
+
+
+nano ~/.bashrc
+# or
+nano ~/.zshrc
+Add the following lines to the file:
+
+
+export MYSQL_CONNECTION_STRING="your-connection-string"
+export KNOWIT_ADMIN_USERNAME="admin@example.com"
+export KNOWIT_ADMIN_PASSWORD="securepassword"
+export AWS_ACCESS_KEY_ID="your-access-key-id"
+export AWS_SECRET_ACCESS_KEY="your-secret-access-key"
+Save and close the file.
+
+Reload the shell configuration to apply the changes:
+
+
+source ~/.bashrc
+# or
+source ~/.zshrc
+Verify that the variables are set:
+
+
+echo $MYSQL_CONNECTION_STRING
+echo $KNOWIT_ADMIN_USERNAME
+
+With these steps, your environment variables will be available every time you open a new terminal session.
+
+### Running the Docker Container with Environment Variables
+
+When running the Docker container for the KnowIT application, you can pass environment variables using the -e option with the docker run command. Here's how you can do it:
+
+Steps:
+
+Build the Docker Image
+Ensure you have built the Docker image for the application.
+Run the following command in the root directory of the project:
+
+
+docker build -t knowit .
+Run the Docker Container with Environment Variables
+Use the -e flag to set each environment variable when starting the container. Ignore the AWS varaibles if not setting up with AWS RDS:
+
+
+docker run -d -p 8080:80 \
+-e MYSQL_CONNECTION_STRING="your-connection-string" \
+-e KNOWIT_ADMIN_USERNAME="admin@example.com" \
+-e KNOWIT_ADMIN_PASSWORD="securepassword" \
+-e AWS_ACCESS_KEY_ID="your-access-key-id" \
+-e AWS_SECRET_ACCESS_KEY="your-secret-access-key" \
+knowit
+
+This command will:
+
+Map port 8080 on your local machine to port 80 inside the container.
+Pass the required environment variables to the container.
+Run the application in the background.
+Verify the Application
+Once the container is running, you can access the application in your browser at:
+http://localhost:8080
+
+Optional: Use an .env File for Simplicity
+To avoid typing the environment variables every time, you can use an .env file to store them.
+
+Create an .env file in the root of your project. Again, ignore the AWS varaibles if not setting up with AWS RDS:
+
+MYSQL_CONNECTION_STRING="your-connection-string"
+KNOWIT_ADMIN_USERNAME="admin@example.com"
+KNOWIT_ADMIN_PASSWORD="securepassword"
+AWS_ACCESS_KEY_ID="your-access-key-id"
+AWS_SECRET_ACCESS_KEY="your-secret-access-key"
+
+Run the Docker container with the --env-file option:
+
+docker run -d -p 8080:80 --env-file .env knowit
+Stop the Container
+If you need to stop the running container, use:
+
+docker ps  # Get the container ID
+docker stop <container_id>
+
+
+Check Logs
+If the application doesn’t start as expected, you can check the logs for debugging:
+
+docker logs <container_id>

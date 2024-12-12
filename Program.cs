@@ -31,7 +31,6 @@ var logger = loggerFactory.CreateLogger<Program>();
 // Function to retrieve the connection string
 string GetConnectionString()
 {
-    // Check for the connection string in environment variables
     string connectionString = Environment.GetEnvironmentVariable("MYSQL_CONNECTION_STRING");
 
     if (string.IsNullOrEmpty(connectionString))
@@ -52,7 +51,6 @@ string GetConnectionStringFromSecretsManager(ILogger logger)
     try
     {
         logger.LogInformation("Attempting to retrieve secrets and metadata from AWS Secrets Manager...");
-
         var client = new AmazonSecretsManagerClient(Amazon.RegionEndpoint.USEast1);
 
         var describeRequest = new DescribeSecretRequest
@@ -61,7 +59,6 @@ string GetConnectionStringFromSecretsManager(ILogger logger)
         };
 
         var describeResponse = client.DescribeSecretAsync(describeRequest).Result;
-
         var tags = describeResponse.Tags;
         string server = tags.FirstOrDefault(tag => tag.Key == "Server")?.Value;
         string database = tags.FirstOrDefault(tag => tag.Key == "Database")?.Value;
@@ -77,7 +74,6 @@ string GetConnectionStringFromSecretsManager(ILogger logger)
         };
 
         var secretResponse = client.GetSecretValueAsync(secretRequest).Result;
-
         var secretJson = secretResponse.SecretString;
         var secretData = JsonConvert.DeserializeObject<Dictionary<string, string>>(secretJson);
 
@@ -96,13 +92,37 @@ string GetConnectionStringFromSecretsManager(ILogger logger)
     }
 }
 
+// Function to retrieve admin credentials
+string GetAdminCredentials(ILogger logger)
+{
+    string adminUsername = Environment.GetEnvironmentVariable("KNOWIT_ADMIN_USERNAME");
+    string adminPassword = Environment.GetEnvironmentVariable("KNOWIT_ADMIN_PASSWORD");
+
+    if (string.IsNullOrEmpty(adminUsername) || string.IsNullOrEmpty(adminPassword))
+    {
+        if (string.IsNullOrEmpty(adminUsername))
+            logger.LogInformation("KNOWIT_ADMIN_USERNAME is empty, falling back...");
+        if (string.IsNullOrEmpty(adminPassword))
+            logger.LogInformation("KNOWIT_ADMIN_PASSWORD is empty, falling back...");
+
+        return GetAdminCredentialsFromSecretsManager(logger, "KnowIT_Admin_Login");
+    }
+
+    var dictionary = new Dictionary<string, string>
+    {
+        { "adminEmail", adminUsername },
+        { "adminPassword", adminPassword }
+    };
+
+    return JsonConvert.SerializeObject(dictionary);
+}
+
 // Function to retrieve admin credentials from AWS Secrets Manager
 string GetAdminCredentialsFromSecretsManager(ILogger logger, string secretId)
 {
     try
     {
         logger.LogInformation($"Attempting to retrieve admin credentials from AWS Secrets Manager: {secretId}");
-
         var client = new AmazonSecretsManagerClient(Amazon.RegionEndpoint.USEast1);
         var secretRequest = new GetSecretValueRequest { SecretId = secretId };
         var secretResponse = client.GetSecretValueAsync(secretRequest).Result;
@@ -138,11 +158,9 @@ using (var scope = app.Services.CreateScope())
     try
     {
         scopedLogger.LogInformation("Attempting to open database connection...");
-
         var dbContext = scope.ServiceProvider.GetRequiredService<KnowledgeDbContext>();
         dbContext.Database.OpenConnection();
         dbContext.Database.EnsureCreated();
-
         scopedLogger.LogInformation("Database connection successfully opened and ensured created.");
     }
     catch (Exception ex)
@@ -152,7 +170,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -183,7 +201,7 @@ using (var scope = app.Services.CreateScope())
             await roleManager.CreateAsync(new IdentityRole(adminRole));
         }
 
-        string secretJson = GetAdminCredentialsFromSecretsManager(logger, "KnowIT_Admin_Login");
+        string secretJson = GetAdminCredentials(scopedLogger);
         var secretData = JsonConvert.DeserializeObject<Dictionary<string, string>>(secretJson);
 
         string adminEmail = secretData["adminEmail"];
